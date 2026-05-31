@@ -8,7 +8,7 @@
 
 **Date:** 2026-05-31
 **Status:** Accepted
-**Deciders:** [Your Team Names]
+**Deciders:** Aaron Graf, Dr. Valerie Haywood, Aaron Tobias
 
 ---
 
