@@ -1,14 +1,15 @@
 require('dotenv').config();
 const express = require('express');
-const tableRoutes = require('./routes/tableRoutes');
+const cors = require('cors'); // Keep this
+const tableRoutes = require('./routes/tableRoutes'); // Keep your routes
 
 const app = express();
+
+// Middleware
+app.use(cors()); // Keep this
 app.use(express.json());
 
-// Tell the app to use our new routes
-app.use('/api/tables', tableRoutes);
+// Routes
+app.use('/api/tables', tableRoutes); // Keep your route setup
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// ... the rest of the file (SERVER START section) remains as it is
