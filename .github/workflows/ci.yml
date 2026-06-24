@@ -22,7 +22,10 @@ jobs:
         run: npm ci
 
       - name: Run Linter
-        run: npm run lint
+        run: |
+          cd frontend
+          npm install
+          npm run lint
 
       - name: Run Tests
         run: npm test
