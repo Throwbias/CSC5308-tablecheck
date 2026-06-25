@@ -13,3 +13,7 @@ VALUES
     ('T8', 6, false),
     ('B1', 2, false), 
     ('B2', 2, false);
+
+    -- Seed a dummy user record for testing Aaron G's visual login screen
+INSERT INTO staff_users (email, password_hash, role) VALUES
+('host@tablelogic.com', '$2a$10$placeholderhashforbcryptdemo', 'manager');

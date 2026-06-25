@@ -1,0 +1,39 @@
+## Summary
+[1-2 sentences describing what this PR does and why it is needed.]
+
+## Type of Change
+- [ ] New feature
+- [ ] Bug fix
+- [ ] Refactoring (no behavior change)
+- [ ] Documentation update
+- [ ] Chore (tooling, config, dependencies)
+
+## Changes Made
+* [Change 1 - be specific]
+* [Change 2]
+* [Change 3]
+
+## How to Test
+[Step-by-step instructions to manually verify this works.]
+1. [Step 1]
+2. [Step 2]
+3. Expected result: [describe what should happen]
+4. Error case to verify: [describe an error case and expected result]
+
+## Automated Tests
+- [ ] New tests added for this change
+- [ ] All existing tests still pass: [your test command]
+- [ ] Test coverage has not decreased
+
+## Checklist
+- [ ] Code follows the project's layered architecture
+- [ ] No secrets, API keys, or credentials committed
+- [ ] No debug output or temporary print statements left in code
+- [ ] .env.example updated if new environment variables were added
+- [ ] Documentation updated if behavior changed (README, SRS, ADR if applicable)
+
+## Related Issues
+Closes #[issue number]
+
+## Screenshots (if UI change)
+[Before/After]
