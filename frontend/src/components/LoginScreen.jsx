@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 export default function LoginScreen({ onLogin }) {
   const [staffId, setStaffId] = useState("");
   const [password, setPassword] = useState("");
