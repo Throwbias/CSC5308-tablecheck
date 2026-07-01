@@ -1,15 +1,14 @@
-const tableRepository = require('../repositories/tableRepository');
+const tableRepo = require('../repositories/tableRepository');
 
 const fetchAllTables = async () => {
-  return await tableRepository.getAllTables();
+  return await tableRepo.getAllTables();
 };
 
-const changeTableOccupancy = async (id, isOccupied) => {
-  // This is the specific business rule your tests are checking for!
+const changeTableStatus = async (id, isOccupied) => {
   if (!id || typeof id !== 'number' || typeof isOccupied !== 'boolean') {
     throw new Error('VALIDATION_ERROR: Invalid table parameters provided.');
   }
-  return await tableRepository.updateTableStatus(id, isOccupied);
+  return await tableRepo.updateTableStatus(id, isOccupied);
 };
 
-module.exports = { fetchAllTables, changeTableOccupancy };
+module.exports = { fetchAllTables, changeTableStatus };
