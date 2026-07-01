@@ -3,17 +3,22 @@ import { getTables, updateTableStatus } from "../api/tableApi";
 
 export function useTables() {
   const [tables, setTables] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Initialized to true to prevent cascading renders
   const [error, setError] = useState("");
 
-  async function loadTables() {
+  // Default isReload to true for manual refreshes
+  async function loadTables(isReload = true) {
     try {
-      setLoading(true);
+      if (isReload) {
+        setLoading(true);
+      }
       setError("");
 
       const tableData = await getTables();
       setTables(tableData);
     } catch (err) {
+      // Option 2: Log the error for developers, show generic message to users
+      console.error("Table fetch failed:", err);
       setError("Unable to load table data. Please check the backend connection.");
     } finally {
       setLoading(false);
@@ -32,12 +37,16 @@ export function useTables() {
         )
       );
     } catch (err) {
+      // Option 2: Log the error for developers, show generic message to users
+      console.error("Table status update failed:", err);
       setError("Unable to update table status. Please try again.");
     }
   }
 
   useEffect(() => {
-    loadTables();
+    // Pass false on initial mount to prevent the immediate re-render loop
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadTables(false);
   }, []);
 
   return {
