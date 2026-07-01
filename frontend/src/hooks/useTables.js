@@ -45,6 +45,7 @@ export function useTables() {
 
   useEffect(() => {
     // Pass false on initial mount to prevent the immediate re-render loop
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadTables(false);
   }, []);
 

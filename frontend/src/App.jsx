@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Table from "./components/Table";
 import MapLegend from "./components/MapLegend";
 import LoginScreen from "./components/LoginScreen";
