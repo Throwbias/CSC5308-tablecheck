@@ -1,0 +1,19 @@
+openapi: 3.0.0
+info:
+  title: TableLogic API
+  version: 1.0.0
+  description: Core API for managing restaurant tables and occupancy status.
+servers:
+  - url: http://localhost:3000/api
+paths:
+  /tables:
+    get:
+      summary: Get all tables
+      responses:
+        '200':
+          description: A list of tables
+          content:
+            application/json:
+              example:
+                status: "success"
+                data: [{ "id": 1, "isOccupied": false }]
