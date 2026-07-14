@@ -5,10 +5,13 @@ info:
   description: Core API for managing restaurant tables and occupancy status.
 servers:
   - url: http://localhost:3000/api
+    description: Local Development Server
+
 paths:
   /tables:
     get:
       summary: Get all tables
+      description: Fetches a list of all restaurant tables and their current status.
       responses:
         '200':
           description: A list of tables
@@ -16,4 +19,141 @@ paths:
             application/json:
               example:
                 status: "success"
-                data: [{ "id": 1, "isOccupied": false }]
+                data: 
+                  - id: 1
+                    table_number: 12
+                    capacity: 4
+                    isOccupied: false
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                status: "error"
+                error:
+                  code: "SERVER_ERROR"
+                  message: "Failed to retrieve tables."
+
+    post:
+      summary: Create a new table
+      description: Adds a new table to the restaurant floor plan.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              table_number: 15
+              capacity: 6
+      responses:
+        '201':
+          description: Table created successfully
+          content:
+            application/json:
+              example:
+                status: "success"
+                data:
+                  id: 10
+                  table_number: 15
+                  capacity: 6
+                  isOccupied: false
+        '400':
+          description: Bad Request (Validation Error)
+          content:
+            application/json:
+              example:
+                status: "error"
+                error:
+                  code: "VALIDATION_ERROR"
+                  message: "table_number and capacity are required."
+
+  /tables/{id}:
+    get:
+      summary: Get a specific table
+      description: Fetches details for a single table by its ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The table ID
+      responses:
+        '200':
+          description: Table details
+          content:
+            application/json:
+              example:
+                status: "success"
+                data:
+                  id: 1
+                  table_number: 12
+                  capacity: 4
+                  isOccupied: false
+        '404':
+          description: Table not found
+          content:
+            application/json:
+              example:
+                status: "error"
+                error:
+                  code: "NOT_FOUND"
+                  message: "Table not found."
+
+    patch:
+      summary: Update table occupancy status
+      description: Partially updates a table (e.g., toggling occupancy when seated or cleared).
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              isOccupied: true
+      responses:
+        '200':
+          description: Table updated successfully
+          content:
+            application/json:
+              example:
+                status: "success"
+                data:
+                  id: 1
+                  table_number: 12
+                  capacity: 4
+                  isOccupied: true
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              example:
+                status: "error"
+                error:
+                  code: "VALIDATION_ERROR"
+                  message: "Invalid table parameters provided."
+
+    delete:
+      summary: Remove a table
+      description: Removes a table completely from the database.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Table deleted successfully (No Content)
+        '404':
+          description: Table not found
+          content:
+            application/json:
+              example:
+                status: "error"
+                error:
+                  code: "NOT_FOUND"
+                  message: "Table not found."
