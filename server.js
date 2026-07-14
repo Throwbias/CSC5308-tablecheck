@@ -1,4 +1,8 @@
-require('dotenv').config(); 
+// Make dotenv conditional so it only runs in non-production environments
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const express = require('express');
 const cors = require('cors');
 
