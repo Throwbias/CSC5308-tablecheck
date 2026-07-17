@@ -8,8 +8,13 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { tables, loading, error, toggleTableStatus, reloadTables } = useTables();
 
-  const availableCount = tables.filter((table) => !table.is_occupied).length;
-  const occupiedCount = tables.filter((table) => table.is_occupied).length;
+  // 1. CREATE A GUARANTEED ARRAY
+  // If tables is an array, use it. If it's undefined, null, or an object, use an empty array []
+  const safeTables = Array.isArray(tables) ? tables : [];
+
+  // 2. USE THE GUARANTEED ARRAY FOR YOUR COUNTS
+  const availableCount = safeTables.filter((table) => !table.is_occupied).length;
+  const occupiedCount = safeTables.filter((table) => table.is_occupied).length;
 
   if (!isLoggedIn) {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
@@ -53,7 +58,8 @@ function App() {
           fontWeight: "bold",
         }}
       >
-        <div>Total Tables: {tables.length}</div>
+        {/* 3. USE SAFETABLES HERE */}
+        <div>Total Tables: {safeTables.length}</div>
         <div style={{ color: "#22c55e" }}>Available: {availableCount}</div>
         <div style={{ color: "#ef4444" }}>Occupied: {occupiedCount}</div>
       </section>
@@ -86,7 +92,8 @@ function App() {
             gap: "20px",
           }}
         >
-          {tables.map((table) => (
+          {/* 4. USE SAFETABLES HERE TO PREVENT .MAP() CRASHES */}
+          {safeTables.map((table) => (
             <Table
               key={table.id}
               {...table}

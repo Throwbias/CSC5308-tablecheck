@@ -15,6 +15,7 @@ export function useTables() {
       setError("");
 
       const tableData = await getTables();
+      console.log("Data from backend:", tableData);
       setTables(tableData);
     } catch (err) {
       // Option 2: Log the error for developers, show generic message to users
