@@ -13,7 +13,7 @@ const updateStatus = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { is_occupied } = req.body;
-    const updatedTable = await tableService.changeTableStatus(id, is_occupied);
+    const updatedTable = await tableService.changeTableOccupancy(id, is_occupied);
     res.status(200).json(updatedTable);
   } catch (error) {
     if (error.message.includes('VALIDATION_ERROR')) {

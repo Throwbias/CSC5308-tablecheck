@@ -1,15 +1,23 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors'); // Keep this
-const tableRoutes = require('./routes/tableRoutes'); // Keep your routes
+const cors = require('cors');
+const tableRoutes = require('./routes/tableRoutes');
 
 const app = express();
 
 // Middleware
-app.use(cors()); // Keep this
+app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/tables', tableRoutes); // Keep your route setup
+app.use('/api/tables', tableRoutes);
 
-// ... the rest of the file (SERVER START section) remains as it is
+// Server Start
+// Only start the server if this file is run directly by Node
+if (require.main === module) {
+  app.listen(3000, () => {
+    console.log('Server running on port 3000');
+  });
+}
+
+module.exports = app;
