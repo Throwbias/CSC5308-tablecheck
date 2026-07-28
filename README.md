@@ -63,6 +63,9 @@ Run frontend UI tests:
 `cd frontend && npm test`
 *(See /tests/README.md for more detail on the test suite structure).*
 
+**CI/CD Requirements:**
+* This project enforces a minimum of 70% line coverage for all tests. Pull requests will fail if this threshold is not met.
+
 ## Project Structure
 mcs5308-tablecheck/
 ├── .github/           - GitHub templates and Actions workflows
