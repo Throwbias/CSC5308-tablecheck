@@ -15,6 +15,9 @@ const PORT = process.env.PORT || 3000;
 // === Middleware ===
 app.use(cors());
 app.use(express.json()); // Required to parse JSON in POST/PATCH request bodies
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 
 // === API Routes ===
 // 2. Mount the table routes to the '/api/tables' path
