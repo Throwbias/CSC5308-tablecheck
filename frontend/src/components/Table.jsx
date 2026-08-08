@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function Table({ table_name, capacity, is_occupied, onClick }) {
   const bgColor = is_occupied ? "#ef4444" : "#22c55e";
 
