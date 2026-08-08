@@ -26,6 +26,9 @@ jobs:
           cd frontend
           npm install
           npm run lint
+          
+      - name: Security Gate - Dependency Vulnerability Scan
+        run: npm audit --audit-level=high
 
       - name: Run Tests
         run: npm test
