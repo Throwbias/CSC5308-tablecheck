@@ -1,37 +1,53 @@
 const tableController = require('../../controllers/tableController');
 const tableService = require('../../services/tableService');
 
-// This line must be here to prevent the test from using the real service
+// Mock the table service
 jest.mock('../../services/tableService');
 
 describe('Table Controller', () => {
     let req, res;
+    const mockTables = [{ id: 1, is_occupied: false }];
 
     beforeEach(() => {
+        // Reset request and response mocks before each test
         req = {};
         res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
         };
+        jest.clearAllMocks();
     });
 
     test('should return 200 and all tables when fetchAllTables succeeds', async () => {
-        const mockTables = [{ id: 1, is_occupied: false }];
+        // Arrange
         tableService.fetchAllTables.mockResolvedValue(mockTables);
 
-        // Ensure this matches the function name in tableController.js
-        await tableController.getTables(req, res); 
+        // Act
+        await tableController.getAllTables(req, res);
 
+        // Assert
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith(mockTables);
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'success',
+            data: mockTables
+        });
     });
 
     test('should return 500 when fetchAllTables fails', async () => {
+        // Arrange
         tableService.fetchAllTables.mockRejectedValue(new Error('DB Error'));
 
-        await tableController.getTables(req, res);
+        // Act
+        await tableController.getAllTables(req, res);
 
+        // Assert
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ error: 'Internal Server Error' });
+        expect(res.json).toHaveBeenCalledWith({
+            status: 'error',
+            error: {
+                code: 'SERVER_ERROR',
+                message: 'Failed to retrieve tables.'
+            }
+        });
     });
 });

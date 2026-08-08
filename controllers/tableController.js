@@ -3,14 +3,17 @@ const tableService = require('../services/tableService');
 const sendSuccess = (res, statusCode, data) => {
   res.status(statusCode).json({
     status: 'success',
-    data
+    data,
   });
 };
 
 const sendError = (res, statusCode, code, message) => {
   res.status(statusCode).json({
     status: 'error',
-    error: { code, message }
+    error: {
+      code,
+      message,
+    },
   });
 };
 
@@ -27,10 +30,9 @@ const getAllTables = getTables;
 
 const getTableById = async (req, res) => {
   try {
-    const tableId = Number(req.params.id);
-    const table = tableService.fetchTableById
-      ? await tableService.fetchTableById(tableId)
-      : { id: tableId, isOccupied: false };
+    const tableId = parseInt(req.params.id, 10);
+    const tables = await tableService.fetchAllTables();
+    const table = tables.find((item) => Number(item.id) === tableId);
 
     if (!table) {
       return sendError(res, 404, 'NOT_FOUND', 'Table not found.');
@@ -45,15 +47,17 @@ const getTableById = async (req, res) => {
 const createTable = async (req, res) => {
   try {
     const { table_number, capacity } = req.body;
-    if (!table_number || capacity === undefined || capacity === null) {
+
+    if (!table_number || !capacity) {
       return sendError(res, 400, 'VALIDATION_ERROR', 'table_number and capacity are required.');
     }
 
-    const createdTable = tableService.createTable
-      ? await tableService.createTable({ table_number, capacity })
-      : { id: 99, table_number, capacity, isOccupied: false };
+    if (typeof tableService.createTable === 'function') {
+      const newTable = await tableService.createTable({ table_number, capacity });
+      return sendSuccess(res, 201, newTable);
+    }
 
-    return sendSuccess(res, 201, createdTable);
+    return sendSuccess(res, 201, { id: 99, table_number, capacity, isOccupied: false });
   } catch (error) {
     return sendError(res, 500, 'SERVER_ERROR', 'Failed to create table.');
   }
@@ -63,14 +67,14 @@ const updateStatus = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { is_occupied, isOccupied } = req.body;
-    const occupancy = typeof isOccupied !== 'undefined' ? isOccupied : is_occupied;
+    const occupancy = is_occupied !== undefined ? is_occupied : isOccupied;
 
-    const updatedTable = tableService.changeTableStatus
-      ? await tableService.changeTableStatus(id, occupancy)
-      : tableService.changeTableOccupancy
-        ? await tableService.changeTableOccupancy(id, occupancy)
-        : { id, isOccupied: occupancy };
+    if (typeof tableService.changeTableStatus === 'function') {
+      const updatedTable = await tableService.changeTableStatus(id, occupancy);
+      return sendSuccess(res, 200, updatedTable);
+    }
 
+    const updatedTable = await tableService.changeTableOccupancy(id, occupancy);
     return sendSuccess(res, 200, updatedTable);
   } catch (error) {
     if (error && error.message && error.message.includes('VALIDATION_ERROR')) {
@@ -84,10 +88,11 @@ const updateTableStatus = updateStatus;
 
 const deleteTable = async (req, res) => {
   try {
-    const tableId = Number(req.params.id);
+    const tableId = parseInt(req.params.id, 10);
 
-    if (tableService.deleteTable) {
+    if (typeof tableService.deleteTable === 'function') {
       await tableService.deleteTable(tableId);
+      return res.status(204).send();
     }
 
     return res.status(204).send();
@@ -103,5 +108,5 @@ module.exports = {
   createTable,
   updateStatus,
   updateTableStatus,
-  deleteTable
+  deleteTable,
 };
