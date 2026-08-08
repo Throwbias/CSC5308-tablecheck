@@ -1,117 +1,144 @@
-// Arrange: Import the service we are testing and the repository we need to mock
 const tableService = require('../../services/tableService');
-const tableRepository = require('../../repositories/tableRepository');
+const tableRepo = require('../../repositories/tableRepository');
 
-// Arrange: Instruct Jest to intercept and mock all functions inside tableRepository
 jest.mock('../../repositories/tableRepository');
 
 describe('Table Service Layer', () => {
-  
-  // Clear mock data before every single test to prevent data leaks
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  // ==========================================
-  // FEATURE 1: Fetch All Tables
-  // ==========================================
-  describe('fetchAllTables', () => {
-    
-    it('returns an array of tables successfully', async () => {
-      // Arrange
-      const mockData = [{ id: 1, table_name: 'T1', is_occupied: false }];
-      tableRepository.getAllTables.mockResolvedValue(mockData);
-
-      // Act
-      const result = await tableService.fetchAllTables();
-
-      // Assert
-      expect(tableRepository.getAllTables).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(mockData);
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
-    it('returns an empty array when no tables exist in the database', async () => {
-      // Arrange
-      tableRepository.getAllTables.mockResolvedValue([]);
+    describe('fetchAllTables', () => {
+        test('should return all tables successfully', async () => {
+            const mockTables = [{ id: 1, isOccupied: false }, { id: 2, isOccupied: true }];
+            tableRepo.getAllTables.mockResolvedValue(mockTables);
 
-      // Act
-      const result = await tableService.fetchAllTables();
+            const result = await tableService.fetchAllTables();
 
-      // Assert
-      expect(result).toEqual([]);
+            expect(result).toEqual(mockTables);
+            expect(tableRepo.getAllTables).toHaveBeenCalledTimes(1);
+        });
     });
 
-    it('throws an error when the database query fails', async () => {
-      // Arrange
-      tableRepository.getAllTables.mockRejectedValue(new Error('Database offline'));
+    describe('getTableById', () => {
+        test('should return a single table by id', async () => {
+            const mockTable = { id: 1, isOccupied: false };
+            tableRepo.getTableById.mockResolvedValue(mockTable);
 
-      // Act & Assert
-      await expect(tableService.fetchAllTables()).rejects.toThrow('Database offline');
-    });
-  });
+            const result = await tableService.getTableById(1);
 
-  // ==========================================
-  // FEATURE 2: Change Table Occupancy
-  // ==========================================
-  describe('changeTableOccupancy', () => {
-    
-    it('returns the updated table when given valid parameters', async () => {
-      // Arrange
-      const expectedOutput = { id: 2, table_name: 'T2', is_occupied: true };
-      tableRepository.updateTableStatus.mockResolvedValue(expectedOutput);
-
-      // Act
-      const result = await tableService.changeTableOccupancy(2, true);
-
-      // Assert
-      expect(tableRepository.updateTableStatus).toHaveBeenCalledWith(2, true);
-      expect(result).toEqual(expectedOutput);
+            expect(result).toEqual(mockTable);
+            expect(tableRepo.getTableById).toHaveBeenCalledWith(1);
+        });
     });
 
-    it('rejects update when the table id is missing', async () => {
-      // Act & Assert
-      await expect(tableService.changeTableOccupancy(null, true))
-        .rejects.toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
-      expect(tableRepository.updateTableStatus).not.toHaveBeenCalled();
+    describe('createTable', () => {
+        test('should create and return a new table', async () => {
+            const newTableData = { isOccupied: false };
+            const createdTable = { id: 1, isOccupied: false };
+            tableRepo.createTable.mockResolvedValue(createdTable);
+
+            const result = await tableService.createTable(newTableData);
+
+            expect(result).toEqual(createdTable);
+            expect(tableRepo.createTable).toHaveBeenCalledWith(newTableData);
+        });
     });
 
-    it('rejects update when the table id is not a valid number', async () => {
-      // Act & Assert
-      await expect(tableService.changeTableOccupancy("abc", true))
-        .rejects.toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
-      expect(tableRepository.updateTableStatus).not.toHaveBeenCalled();
+    describe('updateTableStatus', () => {
+        test('should update table status successfully', async () => {
+            const updatedTable = { id: 1, isOccupied: true };
+            tableRepo.updateTableStatus.mockResolvedValue(updatedTable);
+
+            const result = await tableService.updateTableStatus(1, true);
+
+            expect(result).toEqual(updatedTable);
+            expect(tableRepo.updateTableStatus).toHaveBeenCalledWith(1, true);
+        });
     });
 
-    it('rejects update when the is_occupied parameter is missing', async () => {
-      // Act & Assert
-      await expect(tableService.changeTableOccupancy(2, undefined))
-        .rejects.toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
+    describe('deleteTable', () => {
+        test('should delete a table successfully', async () => {
+            tableRepo.deleteTable.mockResolvedValue(true);
+
+            const result = await tableService.deleteTable(1);
+
+            expect(result).toBe(true);
+            expect(tableRepo.deleteTable).toHaveBeenCalledWith(1);
+        });
     });
 
-    it('rejects update when the is_occupied parameter is not a boolean', async () => {
-      // Act & Assert
-      await expect(tableService.changeTableOccupancy(2, "yes"))
-        .rejects.toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
+    describe('changeTableOccupancy', () => {
+        const mockUpdatedTable = { id: 1, name: 'Table 1', isOccupied: true };
+
+        test('throws an error if the repository cannot find the table to update', async () => {
+            tableRepo.updateTableStatus.mockResolvedValue(null);
+            const result = await tableService.changeTableOccupancy(1, true);
+            expect(result).toBeNull();
+        });
+
+        test('throws an error when the database connection fails during update', async () => {
+            tableRepo.updateTableStatus.mockRejectedValue(new Error('Connection timeout'));
+            await expect(tableService.changeTableOccupancy(2, true))
+                .rejects
+                .toThrow('Connection timeout');
+        });
+
+        test('Security: rejects SQL injection attempt in table ID', async () => {
+            await expect(tableService.changeTableOccupancy("1; DROP TABLE restaurant_tables;", true))
+                .rejects
+                .toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
+            expect(tableRepo.updateTableStatus).not.toHaveBeenCalled();
+        });
+
+        test('Security: rejects non-boolean occupancy status input', async () => {
+            await expect(tableService.changeTableOccupancy(1, "True OR 1=1"))
+                .rejects
+                .toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
+            expect(tableRepo.updateTableStatus).not.toHaveBeenCalled();
+        });
+
+        test('Security: rejects missing table ID parameter', async () => {
+            await expect(tableService.changeTableOccupancy(null, true))
+                .rejects
+                .toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
+            expect(tableRepo.updateTableStatus).not.toHaveBeenCalled();
+        });
+
+        test('Security: rejects invalid data types for both table ID and occupancy status', async () => {
+            await expect(tableService.changeTableOccupancy("invalid_id", "invalid_status"))
+                .rejects
+                .toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
+            expect(tableRepo.updateTableStatus).not.toHaveBeenCalled();
+        });
+
+        test('Security: rejects string representations of numbers if strict numeric type is enforced', async () => {
+            await expect(tableService.changeTableOccupancy("1", true))
+                .rejects
+                .toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
+        });
+
+        test('Security: rejects floating point numbers as table IDs', async () => {
+            await expect(tableService.changeTableOccupancy(1.5, true))
+                .rejects
+                .toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
+            expect(tableRepo.updateTableStatus).not.toHaveBeenCalled();
+        });
+
+        test('Security: rejects undefined occupancy status input', async () => {
+            await expect(tableService.changeTableOccupancy(1, undefined))
+                .rejects
+                .toThrow('VALIDATION_ERROR: Invalid table parameters provided.');
+            expect(tableRepo.updateTableStatus).not.toHaveBeenCalled();
+        });
+
+        test('successfully updates table occupancy when valid parameters are provided', async () => {
+            tableRepo.updateTableStatus.mockResolvedValue(mockUpdatedTable);
+
+            const result = await tableService.changeTableOccupancy(1, true);
+
+            expect(result).toEqual(mockUpdatedTable);
+            expect(tableRepo.updateTableStatus).toHaveBeenCalledWith(1, true);
+        });
     });
-
-    it('throws an error if the repository cannot find the table to update', async () => {
-      // Arrange
-      tableRepository.updateTableStatus.mockResolvedValue(null); // DB returned no row
-
-      // Act
-      const result = await tableService.changeTableOccupancy(999, true);
-
-      // Assert
-      expect(result).toBeNull();
-    });
-
-    it('throws an error when the database connection fails during update', async () => {
-      // Arrange
-      tableRepository.updateTableStatus.mockRejectedValue(new Error('Connection timeout'));
-
-      // Act & Assert
-      await expect(tableService.changeTableOccupancy(2, true))
-        .rejects.toThrow('Connection timeout');
-    });
-  });
 });

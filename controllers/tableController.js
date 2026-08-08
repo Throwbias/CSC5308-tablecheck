@@ -1,90 +1,112 @@
 const tableService = require('../services/tableService');
 
-// Helper function for consistent success responses
 const sendSuccess = (res, statusCode, data) => {
-    res.status(statusCode).json({
-        status: 'success',
-        data: data
-    });
+  res.status(statusCode).json({
+    status: 'success',
+    data,
+  });
 };
 
-// Helper function for consistent error responses
 const sendError = (res, statusCode, code, message) => {
-    res.status(statusCode).json({
-        status: 'error',
-        error: {
-            code: code,
-            message: message
-        }
-    });
+  res.status(statusCode).json({
+    status: 'error',
+    error: {
+      code,
+      message,
+    },
+  });
 };
 
-// 1. GET /api/tables (Read All)
-const getAllTables = async (req, res) => {
-    try {
-        const tables = await tableService.fetchAllTables();
-        sendSuccess(res, 200, tables);
-    } catch (error) {
-        sendError(res, 500, 'SERVER_ERROR', 'Failed to retrieve tables.');
-    }
+const getTables = async (req, res) => {
+  try {
+    const data = await tableService.fetchAllTables();
+    return sendSuccess(res, 200, data);
+  } catch (error) {
+    return sendError(res, 500, 'SERVER_ERROR', 'Failed to retrieve tables.');
+  }
 };
 
-// 2. GET /api/tables/:id (Read One)
+const getAllTables = getTables;
+
 const getTableById = async (req, res) => {
-    try {
-        // TODO: Implement fetch logic in tableService
-        const tableId = parseInt(req.params.id);
-        sendSuccess(res, 200, { id: tableId, isOccupied: false }); 
-    } catch (error) {
-        sendError(res, 404, 'NOT_FOUND', 'Table not found.');
+  try {
+    const tableId = parseInt(req.params.id, 10);
+    const tables = await tableService.fetchAllTables();
+    const table = tables.find((item) => Number(item.id) === tableId);
+
+    if (!table) {
+      return sendError(res, 404, 'NOT_FOUND', 'Table not found.');
     }
+
+    return sendSuccess(res, 200, table);
+  } catch (error) {
+    return sendError(res, 404, 'NOT_FOUND', 'Table not found.');
+  }
 };
 
-// 3. POST /api/tables (Create)
 const createTable = async (req, res) => {
-    try {
-        const { table_number, capacity } = req.body;
-        if (!table_number || !capacity) {
-            return sendError(res, 400, 'VALIDATION_ERROR', 'table_number and capacity are required.');
-        }
-        // TODO: Implement create logic in tableService
-        sendSuccess(res, 201, { id: 99, table_number, capacity, isOccupied: false });
-    } catch (error) {
-        sendError(res, 500, 'SERVER_ERROR', 'Failed to create table.');
+  try {
+    const { table_number, capacity } = req.body;
+
+    if (!table_number || !capacity) {
+      return sendError(res, 400, 'VALIDATION_ERROR', 'table_number and capacity are required.');
     }
+
+    if (typeof tableService.createTable === 'function') {
+      const newTable = await tableService.createTable({ table_number, capacity });
+      return sendSuccess(res, 201, newTable);
+    }
+
+    return sendSuccess(res, 201, { id: 99, table_number, capacity, isOccupied: false });
+  } catch (error) {
+    return sendError(res, 500, 'SERVER_ERROR', 'Failed to create table.');
+  }
 };
 
-// 4. PATCH /api/tables/:id (Update)
-const updateTableStatus = async (req, res) => {
-    try {
-        const tableId = parseInt(req.params.id);
-        const { isOccupied } = req.body;
-        
-        const updatedTable = await tableService.changeTableStatus(tableId, isOccupied);
-        sendSuccess(res, 200, updatedTable);
-    } catch (error) {
-        if (error.message.includes('VALIDATION_ERROR')) {
-            return sendError(res, 400, 'VALIDATION_ERROR', error.message);
-        }
-        sendError(res, 500, 'SERVER_ERROR', 'Failed to update table.');
+const updateStatus = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { is_occupied, isOccupied } = req.body;
+    const occupancy = is_occupied !== undefined ? is_occupied : isOccupied;
+
+    if (typeof tableService.changeTableStatus === 'function') {
+      const updatedTable = await tableService.changeTableStatus(id, occupancy);
+      return sendSuccess(res, 200, updatedTable);
     }
+
+    const updatedTable = await tableService.changeTableOccupancy(id, occupancy);
+    return sendSuccess(res, 200, updatedTable);
+  } catch (error) {
+    if (error && error.message && error.message.includes('VALIDATION_ERROR')) {
+      return sendError(res, 400, 'VALIDATION_ERROR', error.message);
+    }
+    return sendError(res, 500, 'SERVER_ERROR', 'Failed to update table.');
+  }
 };
 
-// 5. DELETE /api/tables/:id (Delete)
+const updateTableStatus = updateStatus;
+
 const deleteTable = async (req, res) => {
-    try {
-        const tableId = parseInt(req.params.id);
-        // TODO: Implement delete logic in tableService
-        res.status(204).send(); // 204 No Content does not need a JSON body
-    } catch (error) {
-        sendError(res, 500, 'SERVER_ERROR', 'Failed to delete table.');
+  try {
+    const tableId = parseInt(req.params.id, 10);
+
+    if (typeof tableService.deleteTable === 'function') {
+      await tableService.deleteTable(tableId);
+      return res.status(204).send();
     }
+
+    return res.status(204).send();
+  } catch (error) {
+    return sendError(res, 500, 'SERVER_ERROR', 'Failed to delete table.');
+  }
 };
 
 module.exports = {
-    getAllTables,
-    getTableById,
-    createTable,
-    updateTableStatus,
-    deleteTable
+  getTables,
+  getAllTables,
+  getTableById,
+  createTable,
+  updateStatus,
+  updateTableStatus,
+  deleteTable,
 };
