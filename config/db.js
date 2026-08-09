@@ -10,4 +10,9 @@ const pool = new Pool({
   }
 });
 
+pool.on('error', (err) => {
+  console.error('Unexpected PostgreSQL client error', err);
+  process.exit(1);
+});
+
 module.exports = pool;
