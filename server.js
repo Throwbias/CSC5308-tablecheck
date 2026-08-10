@@ -5,6 +5,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 const express = require('express');
 const cors = require('cors');
+const { apiLimiter } = require('./middleware/rateLimiter');
+const { CustomError, errorHandler } = require('./middleware/errorHandler');
 
 // 1. Import newly created routes
 const tableRoutes = require('./routes/tableRoutes');
@@ -13,6 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // === Middleware ===
+app.use(apiLimiter);
 app.use(cors());
 app.use(express.json()); // Required to parse JSON in POST/PATCH request bodies
 
@@ -30,15 +33,11 @@ app.get('/', (req, res) => {
 
 // === Global 404 Handler ===
 // Handles requests to undefined routes safely to enforce consistent error formatting
-app.use((req, res) => {
-    res.status(404).json({
-        status: 'error',
-        error: {
-            code: 'NOT_FOUND',
-            message: 'Endpoint not found.'
-        }
-    });
+app.use((req, res, next) => {
+    next(new CustomError('NOT_FOUND', 'Endpoint not found.', 404));
 });
+
+app.use(errorHandler);
 
 // === Start Server ===
 app.listen(PORT, () => {
