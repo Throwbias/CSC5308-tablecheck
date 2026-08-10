@@ -1,6 +1,6 @@
 {
   "name": "csc5308-tablecheck",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "> A real-time table tracker that allows walk-in customers to instantly see live seating availability.",
   "main": "index.js",
   "directories": {
@@ -27,6 +27,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
     "pg": "^8.20.0"
   },
   "devDependencies": {
