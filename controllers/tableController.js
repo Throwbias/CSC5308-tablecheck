@@ -48,7 +48,7 @@ const createTable = async (req, res, next) => {
 const updateTableStatus = async (req, res, next) => {
     try {
         const tableId = parseInt(req.params.id);
-        const { isOccupied } = req.body;
+        const isOccupied = req.body.isOccupied ?? req.body.is_occupied;
         
         const updatedTable = await tableService.changeTableOccupancy(tableId, isOccupied);
         sendSuccess(res, 200, updatedTable);
