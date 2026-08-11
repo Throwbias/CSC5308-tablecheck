@@ -14,7 +14,7 @@ export async function getTables() {
 
 export async function updateTableStatus(id, isOccupied) {
   const response = await api.patch(`/tables/${id}`, {
-    isOccupied,
+    is_occupied: isOccupied,
   });
 
   return response.data.data;
