@@ -15,8 +15,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // === Middleware ===
-app.use(apiLimiter);
+// Enable CORS before any early-response middleware so error responses include CORS headers
 app.use(cors());
+app.use(apiLimiter);
 app.use(express.json()); // Required to parse JSON in POST/PATCH request bodies
 
 // === API Routes ===
