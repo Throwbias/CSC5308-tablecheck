@@ -30,7 +30,11 @@ export function useTables() {
     try {
       setError("");
 
-      const updatedTable = await updateTableStatus(table.id, !table.is_occupied);
+      // Log the outgoing update payload for debugging
+      const newStatus = !table.is_occupied;
+      console.log('toggleTableStatus: sending update for table', table.id, { is_occupied: newStatus });
+      const updatedTable = await updateTableStatus(table.id, newStatus);
+      console.log('toggleTableStatus: server returned', updatedTable);
 
       setTables((currentTables) =>
         currentTables.map((item) =>

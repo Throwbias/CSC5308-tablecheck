@@ -49,6 +49,9 @@ const updateTableStatus = async (req, res, next) => {
     try {
         const tableId = parseInt(req.params.id);
         const isOccupied = req.body.isOccupied ?? req.body.is_occupied;
+        // Debug logs to help diagnose toggle failures from the UI
+        console.log(`PATCH /api/tables/${tableId} received body:`, req.body);
+        console.log(`Parsed isOccupied:`, isOccupied, `type:`, typeof isOccupied);
         
         const updatedTable = await tableService.changeTableOccupancy(tableId, isOccupied);
         sendSuccess(res, 200, updatedTable);
