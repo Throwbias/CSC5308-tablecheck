@@ -7,7 +7,7 @@ const apiLimiter = rateLimit({
     // Include CORS header so browsers can read the JSON body on blocked requests
     res
       .status(429)
-      .set('Retry-After', '900')
+      .set('Retry-After', '10')
       .set('Access-Control-Allow-Origin', '*')
       .json({
         error: {
