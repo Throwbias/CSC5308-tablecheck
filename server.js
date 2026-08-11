@@ -23,7 +23,16 @@ app.use(express.json()); // Required to parse JSON in POST/PATCH request bodies
 // 2. Mount the table routes to the '/api/tables' path
 app.use('/api/tables', tableRoutes);
 
-// === Health Check / Root Endpoint ===
+// === Health Check Endpoint (Deployment Reliability) ===
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'UP',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString()
+    });
+});
+
+// === Root Endpoint ===
 app.get('/', (req, res) => {
     res.status(200).json({ 
         status: 'success', 
@@ -37,9 +46,30 @@ app.use((req, res, next) => {
     next(new CustomError('NOT_FOUND', 'Endpoint not found.', 404));
 });
 
+// Centralized Error Handling Middleware
 app.use(errorHandler);
 
 // === Start Server ===
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+// === Graceful Shutdown Handler (Deployment Reliability) ===
+const gracefulShutdown = (signal) => {
+    console.log(`\n${signal} signal received: closing HTTP server`);
+    
+    server.close(() => {
+        console.log('HTTP server closed. Safe to exit.');
+        process.exit(0); // Standard exit code for a successful shutdown
+    });
+
+    // Force close if it takes longer than 10 seconds
+    setTimeout(() => {
+        console.error('Could not close connections in time, forcefully shutting down');
+        process.exit(1); // Exit code 1 indicates an error/forced shutdown
+    }, 10000);
+};
+
+// Listen for termination signals from Docker/Linux
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
