@@ -50,7 +50,7 @@ const updateTableStatus = async (req, res, next) => {
         const tableId = parseInt(req.params.id);
         const { isOccupied } = req.body;
         
-        const updatedTable = await tableService.changeTableStatus(tableId, isOccupied);
+        const updatedTable = await tableService.changeTableOccupancy(tableId, isOccupied);
         sendSuccess(res, 200, updatedTable);
     } catch (error) {
         if (error.message.includes('VALIDATION_ERROR')) {

@@ -9,13 +9,13 @@ const api = axios.create({
 
 export async function getTables() {
   const response = await api.get("/tables");
-  return response.data;
+  return response.data.data;
 }
 
 export async function updateTableStatus(id, isOccupied) {
   const response = await api.patch(`/tables/${id}`, {
-    is_occupied: isOccupied,
+    isOccupied,
   });
 
-  return response.data;
+  return response.data.data;
 }
