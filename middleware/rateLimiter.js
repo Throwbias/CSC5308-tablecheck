@@ -12,8 +12,8 @@ const apiLimiter = rateLimit({
       .json({
         error: {
           code: 'RATE_LIMITED',
-          message: 'Too many requests. Try again in 15 minutes.',
-          retryAfter: 900,
+          message: 'Too many requests. Try again in 10 seconds.',
+          retryAfter: 10,
         },
       });
   },
