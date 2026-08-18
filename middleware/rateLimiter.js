@@ -1,8 +1,8 @@
 const rateLimit = require('express-rate-limit');
 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 10,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 500,               // Changed from 10 to 500
   handler: (req, res) => {
     // Include CORS header so browsers can read the JSON body on blocked requests
     res
