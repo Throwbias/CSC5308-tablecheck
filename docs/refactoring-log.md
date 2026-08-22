@@ -66,3 +66,20 @@ Separating business logic from UI layout vastly improves maintainability and rea
 
 **Tests:**
 Verified that all existing UI text, styles, state behavior, validation messages, and login callback behaviors were preserved. The frontend linting and production build passed. The root Jest suite (10 tests) passed successfully. No new functionality was added.
+
+---
+
+## Refactoring 4: Establish a Consistent Frontend Visual System
+**Date:** August 21, 2026
+
+**What Changed:**
+Replaced the dashboard's starter-template styles and scattered inline styles with a focused visual system for the TableLogic host workflow. The dashboard now uses a warm paper background, serif display type, restrained sage and clay status colors, summary cards, a clearer floor-plan section, and responsive mobile layouts. Table controls retain their existing click-to-toggle behavior while gaining accessible labels, pressed state semantics, keyboard focus styling, and clearer status indicators. The login layout received the same branding, form styling, and responsive treatment.
+
+**Why This Improves the Experience:**
+The interface now has a coherent visual hierarchy designed for quick front-of-house scanning. Status colors are used as accents rather than large saturated blocks, the floor plan is visually separated from summary information, and the login and dashboard feel like parts of the same product. Removing unused Vite template styles also reduces future styling confusion.
+
+**Behavior Preserved:**
+No API calls, table state logic, login validation, loading handling, error handling, retry behavior, or logout behavior were changed.
+
+**Validation:**
+The frontend production build and lint checks pass from the `frontend` directory.

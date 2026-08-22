@@ -3,6 +3,7 @@ import Table from "./components/Table";
 import MapLegend from "./components/MapLegend";
 import LoginScreen from "./components/LoginScreen";
 import { useTables } from "./hooks/useTables";
+import "./App.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,78 +22,41 @@ function App() {
   }
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <div>
-          <h1>TableLogic Host Dashboard</h1>
-          <p>Live table status stream</p>
-        </div>
+    <main className="dashboard-shell">
+      <header className="dashboard-header">
+        <div className="brand-lockup"><span className="brand-mark" aria-hidden="true">TL</span><div><p className="eyebrow">Front of house</p><h1>TableLogic</h1></div></div>
 
         <button
           onClick={() => setIsLoggedIn(false)}
-          style={{
-            padding: "10px 16px",
-            backgroundColor: "#1f2937",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
+          className="text-button"
         >
           Logout
         </button>
       </header>
 
-      <section
-        style={{
-          display: "flex",
-          gap: "20px",
-          marginBottom: "20px",
-          fontWeight: "bold",
-        }}
-      >
-        {/* 3. USE SAFETABLES HERE */}
-        <div>Total Tables: {safeTables.length}</div>
-        <div style={{ color: "#22c55e" }}>Available: {availableCount}</div>
-        <div style={{ color: "#ef4444" }}>Occupied: {occupiedCount}</div>
+      <section className="welcome-row">
+        <div><p className="eyebrow">Live overview</p><h2>Tonight's dining room</h2><p className="muted-copy">Keep an eye on every table from one place.</p></div>
+        <div className="live-indicator"><span className="live-dot" /> Live status</div>
       </section>
-
-      <MapLegend />
-
-      {loading && <p>Loading table data...</p>}
+      <section className="summary-grid" aria-label="Table summary">
+        <div className="summary-card"><span className="summary-label">Total tables</span><strong>{safeTables.length}</strong></div>
+        <div className="summary-card summary-card-available"><span className="summary-label">Available now</span><strong>{availableCount}</strong></div>
+        <div className="summary-card summary-card-occupied"><span className="summary-label">Occupied</span><strong>{occupiedCount}</strong></div>
+      </section>
+      <section className="floor-plan-section"><div className="section-heading"><div><p className="eyebrow">Dining room</p><h2>Floor plan</h2></div><MapLegend /></div>
+      {loading && <p className="status-message">Loading table data...</p>}
 
       {error && (
         <div
-          style={{
-            padding: "15px",
-            marginBottom: "20px",
-            backgroundColor: "#fee2e2",
-            color: "#991b1b",
-            borderRadius: "8px",
-            fontWeight: "bold",
-          }}
+          className="error-message"
         >
           <p>{error}</p>
-          <button onClick={reloadTables}>Retry</button>
+          <button className="small-button" onClick={reloadTables}>Retry</button>
         </div>
       )}
 
       {!loading && !error && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-            gap: "20px",
-          }}
-        >
-          {/* 4. USE SAFETABLES HERE TO PREVENT .MAP() CRASHES */}
+        <div className="table-grid">
           {safeTables.map((table) => (
             <Table
               key={table.id}
@@ -102,7 +66,8 @@ function App() {
           ))}
         </div>
       )}
-    </div>
+      </section>
+    </main>
   );
 }
 
