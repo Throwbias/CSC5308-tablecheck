@@ -19,24 +19,12 @@ function LoginForm({
   return (
     <form
       onSubmit={onSubmit}
-      style={{
-        width: "360px",
-        padding: "30px",
-        borderRadius: "10px",
-        backgroundColor: "white",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-      }}
+      className="login-card"
     >
-      <h1
-        style={{
-          marginBottom: "20px",
-          fontSize: "2rem",
-          lineHeight: "1.2",
-          textAlign: "center",
-        }}
-      >
-        TableLogic Staff Login
-      </h1>
+      <div className="login-brand"><span className="brand-mark" aria-hidden="true">TL</span><span>TableLogic</span></div>
+      <p className="eyebrow">Staff portal</p>
+      <h1 className="login-title">Welcome back</h1>
+      <p className="login-intro">Sign in to manage the dining room.</p>
 
       <label htmlFor="staffId">Staff ID</label>
       <input
@@ -44,13 +32,7 @@ function LoginForm({
         type="text"
         value={staffId}
         onChange={onStaffIdChange}
-        style={{
-          width: "100%",
-          padding: "10px",
-          marginTop: "6px",
-          marginBottom: "16px",
-          boxSizing: "border-box",
-        }}
+        className="text-input"
       />
 
       <label htmlFor="password">Password</label>
@@ -59,35 +41,21 @@ function LoginForm({
         type="password"
         value={password}
         onChange={onPasswordChange}
-        style={{
-          width: "100%",
-          padding: "10px",
-          marginTop: "6px",
-          marginBottom: "16px",
-          boxSizing: "border-box",
-        }}
+        className="text-input"
       />
 
       {error && (
-        <p style={{ color: "#dc2626", fontWeight: "bold" }}>{error}</p>
+        <p className="form-error" role="alert">{error}</p>
       )}
 
       <button
         type="submit"
-        style={{
-          width: "100%",
-          padding: "12px",
-          backgroundColor: "#1f2937",
-          color: "white",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-        }}
+        className="primary-button"
       >
         Login
       </button>
 
-      <p style={{ marginTop: "16px", fontSize: "0.9rem", color: "#6b7280" }}>
+      <p className="login-note">
         Demo login only. Backend authentication will be added in a later
         sprint.
       </p>
@@ -115,14 +83,7 @@ export default function LoginScreen({ onLogin }) {
 
   return (
     <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily: "sans-serif",
-        backgroundColor: "#f3f4f6",
-      }}
+      className="login-shell"
     >
       <LoginForm
         staffId={staffId}

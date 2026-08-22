@@ -1,22 +1,14 @@
 export default function Table({ table_name, capacity, is_occupied, onClick }) {
-  const bgColor = is_occupied ? "#ef4444" : "#22c55e";
-
   return (
     <button
       onClick={onClick}
-      style={{
-        backgroundColor: bgColor,
-        padding: "20px",
-        borderRadius: "8px",
-        color: "white",
-        textAlign: "center",
-        border: "2px solid #1f2937",
-        cursor: "pointer",
-      }}
+      className={`table-card ${is_occupied ? "is-occupied" : "is-available"}`}
+      aria-label={`${table_name}, ${is_occupied ? "occupied" : "available"}, seats ${capacity}`}
+      aria-pressed={is_occupied}
     >
-      <h2>{table_name}</h2>
-      <p>Seats: {capacity}</p>
-      <p>{is_occupied ? "Occupied" : "Available"}</p>
+      <span className="table-number">{table_name}</span>
+      <span className="table-capacity">Seats {capacity}</span>
+      <span className="table-status"><span className="status-dot" />{is_occupied ? "Occupied" : "Available"}</span>
     </button>
   );
 }
